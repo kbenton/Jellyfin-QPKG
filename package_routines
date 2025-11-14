@@ -34,13 +34,16 @@ detect_primary_volume() {
 
 resolve_qpkg_path() {
     QPKG_DIR="${PRIMARY_VOLUME}/.qpkg"
-    [ -L "$QPKG_DIR" ] && QPKG_DIR=$(readlink -f "$QPKG_DIR") || err_log "Failed to resolve .qpkg symlink."
+    if [ -L "$QPKG_DIR" ]; then
+        QPKG_DIR=$(readlink -f "$QPKG_DIR") || err_log "Failed to resolve .qpkg symlink."
+    fi
     QPKG_PATH="${QPKG_DIR}/${PACKAGE_NAME}"
     CONFIG_DIR="${QPKG_PATH}/config"
 }
 
 verify_container_station() {
-    [ ! -d "${PRIMARY_VOLUME}/.qpkg/container-station" ] && err_log "Container Station not installed."
+    CONTAINER_STATION_DIR=$(/sbin/getcfg container-station Install_Path -f /etc/config/qpkg.conf)
+    [ ! -d "${CONTAINER_STATION_DIR}" ] && err_log "Container Station not installed."
 }
 
 prepare_directories() {
